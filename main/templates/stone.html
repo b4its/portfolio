@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+{% block content %} {% load static %}
+<html>
+  <head>
+    <title>Permainan Batu Gunting Kertas</title>
+    <link rel="shortcut icon" href="{% static 'stone.jpg' %}   " type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      #game-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      #user-choice {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      h2 {
+        margin-bottom: 10px;
+      }
+
+      img {
+        cursor: pointer;
+        margin: 5px;
+      }
+
+      #result {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+
+      #result-text {
+        margin-bottom: 10px;
+      }
+
+      button {
+        cursor: pointer;
+      }
+      #user-choice {
+        display: flex;
+        flex-direction: row;
+        gap: 50px;
+      }
+
+      button {
+        background: white;
+        border: 1px solid black;
+        padding: 0.5em;
+        width: 100px;
+        border-radius: 5px;
+      }
+      .skor {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        width: 50px;
+        gap: 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="game-container">
+      <h1>JAN KEN PO!</h1>
+      <h2>Pilihan Anda</h2>
+      <div id="user-choice">
+        <img src="{% static 'stone.jpg' %}" style="height: 50px" alt="Batu" id="Batu" onclick="playGame('Batu')" />
+        <img src="{% static 'gunting.jpg' %}" style="height: 50px" alt="Gunting" id="Gunting" onclick="playGame('Gunting')" />
+        <img src="{% static 'paper.jpg' %}" style="height: 50px" alt="Kertas" id="Kertas" onclick="playGame('Kertas')" />
+      </div>
+      <div id="result">
+        <h2>Hasil</h2>
+        <p id="result-text">Pilih salah satu</p>
+        <p id="result-text2">-</p>
+        <p id="result-text3">-</p>
+        <h4>Skor</h4>
+        <div class="skor">
+          <h4>
+            Seri
+            <p id="seri">-</p>
+          </h4>
+          <h4>
+            Menang
+            <p id="menang">-</p>
+          </h4>
+          <h4>
+            Kalah
+            <p id="kalah">-</p>
+          </h4>
+        </div>
+                <audio id="myAudio" src="/media/sfx/kalah.mp3"></audio>
+        <audio id="myAudio2" src="/media/sfx/seri.mp3"></audio>
+        <audio id="myAudio3" src="/media/sfx/menang.mp3"></audio>
+        <button onclick="resetGame()">Ulangi</button>
+        <a href="{% url 'indexes' %}" style="margin-bottom: 5em; background: white; padding: 0.5em; border: 1px solid black; border-radius: 5px; text-decoration: none; color: black; margin-top: 2em">Kembali</a>
+      </div>
+    </div>
+    <script src="script.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script>
+      var audio = document.getElementById("myAudio"); // Mendapatkan elemen audio dengan id "myAudio"
+      var audio2 = document.getElementById("myAudio2"); // Mendapatkan elemen audio dengan id "myAudio"
+      var audio3 = document.getElementById("myAudio3"); // Mendapatkan elemen audio dengan id "myAudio"
+      let userChoice = ""; // pilihan pengguna
+      let resultText = document.getElementById("result-text");
+      let resultText2 = document.getElementById("result-text2");
+      let resultText3 = document.getElementById("result-text3");
+      let seRi = document.getElementById("seri");
+      let meNang = document.getElementById("menang");
+      let kaLah = document.getElementById("kalah");
+      let seri = 0;
+      let menang = 0;
+      let kalah = 0;
+
+      // Fungsi untuk memulai permainan
+      function playGame(choice) {
+        userChoice = choice;
+
+        // Menampilkan hasil pilihan pengguna
+        resultText.textContent = "Pilihan anda: " + userChoice;
+
+        // Generate pilihan komputer
+        let computerChoice = generateComputerChoice();
+
+        // Menentukan hasil permainan
+        let result = determineResult(userChoice, computerChoice);
+
+        // Menampilkan hasil permainan
+        resultText2.textContent = " ";
+        resultText2.textContent += "\nKomputer memilih: " + computerChoice;
+        resultText3.textContent = " ";
+        resultText3.textContent += "\nHasil: " + result;
+        seRi.textContent = " ";
+        seRi.textContent = seri;
+        meNang.textContent = " ";
+        meNang.textContent = menang;
+        kaLah.textContent = " ";
+        kaLah.textContent = kalah;
+        if (seRi.textContent >= 5) {
+          swal({
+            title: "Wah",
+            text: " pada babak kali ini anda Seri!",
+            icon: "info",
+          });
+          audio2.play();
+          seRi.textContent = 0;
+          resetGame();
+        } else if (meNang.textContent >= 5) {
+          swal({
+            title: "Selamaat",
+            text: "pada babak kali ini anda MENANG!",
+            icon: "success",
+          });
+          audio3.play();
+          meNang.textContent = 0;
+          resetGame();
+        } else if (kaLah.textContent >= 5) {
+          swal({
+            title: "Nice try",
+            text: "Mohon maaf pada babak kali ini anda kalah!",
+            icon: "error",
+          });
+          audio.play();
+          kaLah.textContent = 0;
+          resetGame();
+        }
+      }
+
+      // Fungsi untuk menghasilkan pilihan komputer
+      function generateComputerChoice() {
+        let choices = ["Batu", "Gunting", "Kertas"];
+        return choices[Math.floor(Math.random() * choices.length)];
+      }
+
+      // Fungsi untuk menentukan hasil permainan
+      function determineResult(user, computer) {
+        if (user === computer) {
+          swal({
+            title: "Wah",
+            text: "Anda Seri!",
+            icon: "info",
+          });
+          seri += 1;
+          return "Seri";
+        } else if ((user === "Batu" && computer === "Gunting") || (user === "Gunting" && computer === "Kertas") || (user === "Kertas" && computer === "Batu")) {
+          swal({
+            title: "Selamat",
+            text: "Anda Menang!",
+            icon: "success",
+          });
+          menang += 1;
+          return "Anda Menang";
+        } else if ((user === "Gunting" && computer === "Batu") || (user === "Kertas" && computer === "Gunting") || (user === "Batu" && computer === "Kertas")) {
+          swal({
+            title: "Nice Try",
+            text: "Anda kalah!",
+            icon: "error",
+          });
+          kalah += 1;
+          return "Anda Kalah";
+        }
+        // hasil skor
+      }
+      function resetGame() {
+        userChoice = "";
+        document.getElementById("result-text").textContent = "Hasil permainan akan ditampilkan di sini";
+        document.getElementById("result-text2").textContent = "Setelah permainan selesai, silahkan untuk menunggu 7 detik";
+        document.getElementById("result-text3").textContent = "-";
+        document.getElementById("seri").textContent = " ";
+        document.getElementById("menang").textContent = " ";
+        document.getElementById("kalah").textContent = " ";
+        document.getElementById("seri").textContent = 0;
+        document.getElementById("menang").textContent = 0;
+        document.getElementById("kalah").textContent = 0;
+        setTimeout(function () {
+          location.reload();
+        }, 7000);
+      }
+      console.log(menang);
+      console.log(seri);
+      console.log(kalah);
+      // Fungsi untuk mengulangi permainan
+
+      // apabila skor 10
+    </script>
+    <script>
+      document.onkeydown = function (e) {
+        if (event.keyCode == 123) {
+          return false;
+        }
+        if (e.ctrlKey && e.shiftKey && e.keyCode == "I".charCodeAt(0)) {
+          return false;
+        }
+        if (e.ctrlKey && e.shiftKey && e.keyCode == "C".charCodeAt(0)) {
+          return false;
+        }
+        if (e.ctrlKey && e.shiftKey && e.keyCode == "J".charCodeAt(0)) {
+          return false;
+        }
+        if (e.ctrlKey && e.keyCode == "U".charCodeAt(0)) {
+          return false;
+        }
+      };
+    </script>
+    <script>
+      document.addEventListener(
+        "contextmenu",
+        function (e) {
+          e.preventDefault();
+        },
+        false
+      );
+      $(document).bind("contextmenu", function (e) {
+        e.preventDefault();
+      });
+    </script>
+  </body>
+</html>
+{% endblock content %}

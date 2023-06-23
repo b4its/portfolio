@@ -1,0 +1,211 @@
+
+<link href="https://fonts.googleapis.com/css2?family=Lobster&family=Ms+Madi&family=Poppins&display=swap" rel="stylesheet">
+{% load static %}
+<link rel="shortcut icon" href="{% static 'bot-ai.jpg' %}   " type="image/x-icon" />
+{% block content %}
+<style>
+    body {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+*{
+  font-family: 'Poppins', sans-serif;
+
+}
+  .bungkus {
+    display: flex;
+    padding:2em;
+    margin: 8em auto;
+    text-align: center;
+    flex-direction: column;
+    max-width: 600px;
+    border-radius:10px;
+    border:1px solid black
+  }
+  textarea {
+      margin: 0 auto;
+      margin-left:-0.1em;
+    height: 50px;
+    width:200px;
+    border: 1px solid black;
+    border-radius: 9px;
+    justify-content: center;
+    max-width: 500px;
+    transition-property: height,width;
+    transition-duration: 1.7s;
+  }
+  textarea:focus {
+    margin: 0 auto;
+    height: 80px;
+    width:500px;
+    margin-left:-0.1em;
+
+    border: 1px solid black;
+    border-radius: 9px;
+    justify-content: center;
+    max-width: 500px;
+  }
+  .jawaban {
+
+    display:flex;
+    margin: 0.6em auto;
+    justify-content: left;
+    text-align: left;
+    width: 600px;
+    word-wrap: wrap;
+  }
+  .but {
+    text-decoration: none;
+    cursor:pointer;
+
+    color: black;
+    width: 100px;
+    height: 30px;
+    background: white;
+    padding: 0.6em;
+    border-radius: 7px;
+    border: 1px solid black;
+    transition-property: background, color, width;
+    transition-duration: 1.7s;
+  }
+  .but:hover {
+    text-decoration: none;
+    color: white;
+    width: 100px;
+    height: 30px;
+    background: black;
+    padding: 0.6em;
+    border-radius: 7px;
+    border: 1px solid black;
+  }
+  .but:focus {
+    text-decoration: none;
+    color: white;
+    width: 120px;
+    height: 30px;
+    background: black;
+    padding: 0.6em;
+    border-radius: 7px;
+    border: 1px solid black;
+  }
+  p[i] {
+    font-size: 17px;
+    font-weight: bolder;
+  }
+
+  b[i]{
+    font-weight: 100;
+    margin-left:4em;
+  }
+
+  p[k]{
+    text-align:left;
+  }
+  .bot {
+    font-size:13px;
+    text-decoration: none;
+    color: black;
+    width: 60px;
+    height: 20px;
+    background: white;
+    padding: 0.3em;
+    border-radius: 7px;
+    border: 1px solid black;
+    transition-property: background, color, width;
+    transition-duration: 1.7s;
+  }
+  .bot:hover {
+    font-size:13px;
+    text-decoration: none;
+    color: white;
+    width: 60px;
+    height: 20px;
+    background: black;
+    padding: 0.3em;
+    border-radius: 7px;
+    border: 1px solid black;
+  }
+  .bot:focus {
+    font-size:13px;
+    text-decoration: none;
+    color: red;
+    width: 80px;
+    height: 20px;
+    background: white;
+    padding: 0.3em;
+    border-radius: 7px;
+    border: 1px solid red;
+  }
+</style>
+
+<title>Tanya - Ray</title>
+
+<form method="POST" action="{% url 'gpt' %}" class="bungkus" >
+    {% csrf_token %}
+    <a href="{% url 'indexes' %}" class="bot">Kembali</a>
+  <p i>ray akan menjawab apapun pertanyaan anda</p>
+  <br /><textarea type="text" placeholder="Tanyakan apa saja.." id="prompt" name="prompt" required></textarea> <br /><button class="but" type="submit">tanyakan</button>
+</div>
+
+<p k>{{prompt}}</p>
+<div class="jawaban">
+    {% if message %}
+    <b>ray: </b><b i>{{message}}</b>
+    {% else %}
+    <b>ray: </b><b i>Pertanyaan anda akan dijawab disini</b>
+    {% endif %}
+</div>
+</form>
+<p style="font-weight:bold;text-align:center;margin-top:-5em;" >developed by brsaputra14</p>
+
+
+<script>
+  document.onkeydown = function(e) {
+    if(event.keyCode == 123) {
+     return false;
+    }
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) {
+     return false;
+    }
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) {
+     return false;
+    }
+    if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) {
+     return false;
+    }
+    if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) {
+     return false;
+    }
+  }
+</script>
+<script>
+  document.addEventListener("contextmenu", function(e){
+      e.preventDefault();
+  }, false);
+  $(document).bind("contextmenu",function(e) {
+      e.preventDefault();
+     });
+</script>
+
+ {% comment %} <p>{{ message }}</p>
+
+    <form method="POST" action="{% url 'diskusi' %}">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="prompt">Enter a prompt:</label>
+            <input type="text" class="form-control" id="prompt" name="prompt">
+        </div>
+        <button type="submit" class="btn btn-success mt-3">Submit</button>
+    </form>  {% endcomment %}
+    {% comment %} <script>
+        document.addEventListener("contextmenu", function(e){
+            e.preventDefault();
+        }, false);
+        $(document).bind("contextmenu",function(e) {
+            e.preventDefault();
+           });
+    </script>
+     {% endcomment %}
+     {% endblock content %}
